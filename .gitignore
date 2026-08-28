@@ -1,0 +1,15 @@
+# Dépendances Node.js
+node_modules/
+
+# Base de données locale
+dev.sqlite
+
+# Variables d'environnement
+.env
+
+# Résultats des tests
+coverage/
+
+# Fichiers IntelliJ / JetBrains
+.idea/
+*.iml
