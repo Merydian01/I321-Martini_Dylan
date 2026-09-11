@@ -1,107 +1,120 @@
-const express = require("express");
+// routes/products.js
+const express = require('express');
+const { body, param } = require('express-validator');
+const productController = require('../controllers/productController');
+
 const router = express.Router();
-const pizzas = [
-    {
-        id: 1,
-        title: "Margherita",
-        image: null,
-        ingredients: [
-            "Tomato",
-            "Mozzarella",
-            "Basil"
-        ],
-        price: 8.5
-    }
+
+/**
+ * @openapi
+ * /api/products:
+ *   get:
+ *     summary: Retrieve a list of products
+ *     responses:
+ *       200:
+ *         description: A list of products
+ *   post:
+ *     summary: Create a new product
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - price
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               imageUrl:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: Product created
+ *       400:
+ *         description: Invalid input
+ */
+
+/**
+ * @openapi
+ * /api/products/{id}:
+ *   get:
+ *     summary: Get a product by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: A single product
+ *       404:
+ *         description: Product not found
+ *   put:
+ *     summary: Update a product by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               imageUrl:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Product updated
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Product not found
+ *   delete:
+ *     summary: Delete a product by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       204:
+ *         description: Product deleted
+ *       404:
+ *         description: Product not found
+ */
+
+/**
+ * Validation rules
+ */
+const createAndUpdateValidations = [
+    body('name').isString().notEmpty().withMessage('name is required'),
+    body('description').optional().isString(),
+    body('imageUrl').optional().isString().isURL().withMessage('imageUrl must be a valid URL'),
+    body('price').isFloat({ gt: 0 }).withMessage('price must be a positive number'),
 ];
 
-// -- ROUTES -- //
+router.get('/', productController.findAll);
+router.post('/', createAndUpdateValidations, productController.create);
+router.get('/:id', [param('id').isInt().withMessage('id must be an integer')], productController.findOne);
+router.put('/:id', [param('id').isInt().withMessage('id must be an integer'), ...createAndUpdateValidations], productController.update);
+router.delete('/:id', [param('id').isInt().withMessage('id must be an integer')], productController.delete);
 
-// GET -> Affiche toutes les pizzas.
-router.get("/", (req, res) => {
-    res.json(pizzas);
-});
-
-
-//GET -> Affiche une pizza
-router.get("/:id", (req, res) => {
-    const id = Number(req.params.id);
-
-    // Va chercher l'id de la pizza dans le tableau pizzas
-    const pizza = pizzas.find(pizza => pizza.id === id);
-
-    if(!pizza) {
-        // Erreur en cas de pizza non-existante
-        return res.status(404).json({
-            error: "Pizza pas trouvée"
-
-        });
-    }
-    res.status(200).json(pizza);
-});
-
-
-// POST ->  Ajouter une pizza
-router.post("/", (req, res) => {
-    // Récupère les informations de la pizza envoyées par le client
-    const { title, image, ingredients, price} = req.body
-
-    const newPizza ={
-    id: pizzas.length + 1,
-    title: title,
-    image: image,
-    ingredients: ingredients,
-    price: price
-  };
-  pizzas.push(newPizza)
-
-  res.status(201).json(newPizza);
-});
-
-
-// PUT -> Modifier une pizza
-router.put("/:id", (req, res) => {
-    const id = Number(req.params.id);
-    // Récupère les informations de la pizza envoyées par le client
-    const { title, image, ingredients, price} = req.body
-
-    // Cherche la position de la pizza dans le tableau
-    const pizza = pizzas.find(pizza => pizza.id === id);
-
-    if(!pizza) {
-        // Erreur en cas de pizza non-existante
-        return res.status(404).json({
-            error: "Pizza pas trouvée"
-
-        });
-    }
-    pizza.title = title;
-    pizza.image = image;
-    pizza.ingredients = ingredients;
-    pizza.price = price;
-
-    res.status(200).json(pizza);
-
-});
-
-
-// DELETE ->  Supprimer une pizza
-router.delete("/:id", (req, res) => {
-    const id = Number(req.params.id);
-
-    // Cherche la position de la pizza dans le tableau
-    const pizzaIndex = pizzas.findIndex(pizza => pizza.id === id);
-
-    // Si findIndex retourne -1, aucune pizza avec cet id n'existe
-    if (pizzaIndex === -1) {
-        return res.status(404).json({
-            error : "Pizza introuvable"
-        });
-    }
-
-    // Supprime 1 élément du tableau à partir de la position trouvée
-    pizzas.splice(pizzaIndex, 1)
-
-    res.status(204).send();
-
-});
 module.exports = router;

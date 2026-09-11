@@ -1,0 +1,21 @@
+@startuml
+
+actor Client
+participant "app.js" as App
+participant "products.js" as Products
+collections "pizzas[]" as Pizzas
+
+== Création d'une pizza ==
+
+Client -> App : POST /api/products
+App -> Products : Transmet la requête
+
+Products -> Products : Récupère les données du body
+Products -> Products : Crée newPizza
+
+Products -> Pizzas : pizzas.push(newPizza)
+Pizzas --> Products : Pizza ajoutée
+
+Products --> Client : 201 Created + JSON
+
+@enduml
