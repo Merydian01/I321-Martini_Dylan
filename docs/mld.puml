@@ -1,0 +1,31 @@
+@startuml
+
+entity pizzas {
+    * id : INTEGER <<PK>>
+    --
+    * name : TEXT
+    description : TEXT
+    imageUrl : TEXT
+    * price : REAL
+    created_at : TEXT
+    updated_at : TEXT
+}
+
+entity ingredients {
+    * id : INTEGER <<PK>>
+    --
+    * name : TEXT
+    * price : REAL
+    created_at : TEXT
+    updated_at : TEXT
+}
+
+entity pizza_ingredients {
+    * pizza_id : INTEGER <<PK, FK>>
+    * ingredient_id : INTEGER <<PK, FK>>
+}
+
+pizzas ||--|{ pizza_ingredients
+ingredients ||--|{ pizza_ingredients
+
+@enduml

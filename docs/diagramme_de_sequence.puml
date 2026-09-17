@@ -1,0 +1,48 @@
+@startuml
+
+actor Client
+participant "PizzaController" as PizzaController
+participant "IngredientController" as IngredientController
+participant "Pizza" as Pizza
+participant "Ingredient" as Ingredient
+
+== Création d'une pizza ==
+
+Client -> PizzaController : Créer une pizza\n(name, description, imageUrl, price, ingredients)
+
+PizzaController -> PizzaController : Vérifier les paramètres
+
+alt Paramètres invalides
+    PizzaController --> Client : Erreur 400
+else Paramètres valides
+
+    PizzaController -> Pizza : Vérifier si le nom existe
+    Pizza --> PizzaController : existe / n'existe pas
+
+    alt Nom déjà utilisé
+        PizzaController --> Client : Erreur 409
+    else Nom disponible
+
+        PizzaController -> IngredientController : Vérifier les ingrédients
+
+        loop Chaque ingrédient
+            IngredientController -> Ingredient : Rechercher l'ingrédient
+            Ingredient --> IngredientController : trouvé / non trouvé
+        end
+
+        IngredientController --> PizzaController : ingrédients valides / invalides
+
+        alt Un ingrédient n'existe pas
+            PizzaController --> Client : Erreur 400
+        else Tous les ingrédients existent
+
+            PizzaController -> Pizza : Créer la pizza avec ses ingrédients
+            Pizza --> PizzaController : Pizza créée
+
+            PizzaController --> Client : 201 Created + Pizza
+        end
+
+    end
+end
+
+@enduml

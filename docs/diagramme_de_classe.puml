@@ -1,0 +1,35 @@
+@startuml
+
+class Pizza {
+    + id : Integer
+    + name : String
+    + description : String
+    + imageUrl : String
+    + price : Float
+    + created_at : DateTime
+    + updated_at : DateTime
+
+    + create()
+    + findAll()
+    + findById()
+    + update()
+    + delete()
+}
+
+class Ingredient {
+    + id : Integer
+    + name : String
+    + price : Float
+    + created_at : DateTime
+    + updated_at : DateTime
+
+    + create()
+    + findAll()
+    + findById()
+    + update()
+    + delete()
+}
+
+Pizza "1..*" -- "1..*" Ingredient : contient
+
+@enduml
