@@ -42,6 +42,33 @@ class Pizza {
         });
     }
 
+    static findByName(name) {
+        const sql = `SELECT * FROM pizzas WHERE name = ?`;
+
+        return new Promise((resolve, reject) => {
+            db.get(sql, [name], (err, row) => {
+                if (err) return reject(err);
+
+                resolve(row || null);
+            });
+        });
+    }
+
+    static addIngredient(pizzaId, ingredientId) {
+        const sql = `
+            INSERT INTO pizza_ingredients (pizza_id, ingredient_id)
+            VALUES (?, ?)
+        `;
+
+        return new Promise((resolve, reject) => {
+            db.run(sql, [pizzaId, ingredientId], function (err) {
+                if (err) return reject(err);
+
+                resolve(this.changes);
+            });
+        });
+    }
+
     static update(id, { name, description, imageUrl, price }) {
         const sql = `
             UPDATE pizzas

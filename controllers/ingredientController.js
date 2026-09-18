@@ -2,6 +2,10 @@
 const { validationResult } = require('express-validator');
 const Ingredient = require('../entities/Ingredient');
 
+exports.getById = async (id) => {
+    return await Ingredient.findById(id);
+};
+
 /**
  * Controller functions use Express (req, res) signatures and
  * respond with status codes matching MDN/HTTP recommendations.
@@ -9,16 +13,15 @@ const Ingredient = require('../entities/Ingredient');
 
 exports.create = async (req, res, next) => {
     try {
-        // validation result
         const errors = validationResult(req);
+
         if (!errors.isEmpty()) {
-            // 400 Bad Request for validation problems
             return res.status(400).json({ errors: errors.array() });
         }
 
         const { name, price } = req.body;
         const created = await Ingredient.create({ name, price });
-        // 201 Created
+
         return res.status(201).json(created);
     } catch (err) {
         next(err);

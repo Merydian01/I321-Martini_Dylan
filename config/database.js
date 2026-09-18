@@ -32,6 +32,15 @@ const initSql = `
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now'))
     );
+    CREATE TABLE IF NOT EXISTS pizza_ingredients (
+        pizza_id INTEGER NOT NULL,
+        ingredient_id INTEGER NOT NULL,
+        
+        PRIMARY KEY (pizza_id, ingredient_id),
+        
+        FOREIGN KEY (pizza_id) REFERENCES pizzas(id),
+        FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
+        );
 `;
 
 db.serialize(() => {
