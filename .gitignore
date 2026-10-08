@@ -13,3 +13,6 @@ coverage/
 # Fichiers IntelliJ / JetBrains
 .idea/
 *.iml
+# Bases SQLite locales
+ms-pizzas/pizzas.sqlite
+ms-ingredients/ingredients.sqlite

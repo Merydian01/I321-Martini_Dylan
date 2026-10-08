@@ -1,7 +1,7 @@
 {
-  "name": "products-api",
+  "name": "pizzas-api",
   "version": "1.0.0",
-  "description": "RESTful Products API with sqlite3, express-validator, and swagger-ui",
+  "description": "Pizzas microservice",
   "main": "./server.js",
   "scripts": {
     "start": "node server.js",

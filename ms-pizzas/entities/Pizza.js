@@ -4,27 +4,21 @@ class Pizza {
     static create({ name, description, imageUrl, price }) {
         const sql = `INSERT INTO pizzas (name, description, imageUrl, price, created_at, updated_at)
                      VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`;
-
         const params = [name, description || null, imageUrl || null, price];
 
         return new Promise((resolve, reject) => {
             db.run(sql, params, function (err) {
                 if (err) return reject(err);
-
-                Pizza.findById(this.lastID)
-                    .then(resolve)
-                    .catch(reject);
+                Pizza.findById(this.lastID).then(resolve).catch(reject);
             });
         });
     }
 
     static findAll() {
         const sql = `SELECT * FROM pizzas ORDER BY id DESC`;
-
         return new Promise((resolve, reject) => {
             db.all(sql, [], (err, rows) => {
                 if (err) return reject(err);
-
                 resolve(rows);
             });
         });
@@ -32,11 +26,9 @@ class Pizza {
 
     static findById(id) {
         const sql = `SELECT * FROM pizzas WHERE id = ?`;
-
         return new Promise((resolve, reject) => {
             db.get(sql, [id], (err, row) => {
                 if (err) return reject(err);
-
                 resolve(row || null);
             });
         });
@@ -44,27 +36,10 @@ class Pizza {
 
     static findByName(name) {
         const sql = `SELECT * FROM pizzas WHERE name = ?`;
-
         return new Promise((resolve, reject) => {
             db.get(sql, [name], (err, row) => {
                 if (err) return reject(err);
-
                 resolve(row || null);
-            });
-        });
-    }
-
-    static addIngredient(pizzaId, ingredientId) {
-        const sql = `
-            INSERT INTO pizza_ingredients (pizza_id, ingredient_id)
-            VALUES (?, ?)
-        `;
-
-        return new Promise((resolve, reject) => {
-            db.run(sql, [pizzaId, ingredientId], function (err) {
-                if (err) return reject(err);
-
-                resolve(this.changes);
             });
         });
     }
@@ -79,29 +54,52 @@ class Pizza {
                 updated_at = datetime('now')
             WHERE id = ?
         `;
-
         const params = [name, description, imageUrl, price, id];
 
         return new Promise((resolve, reject) => {
             db.run(sql, params, function (err) {
                 if (err) return reject(err);
-
                 if (this.changes === 0) return resolve(null);
-
-                Pizza.findById(id)
-                    .then(resolve)
-                    .catch(reject);
+                Pizza.findById(id).then(resolve).catch(reject);
             });
         });
     }
 
     static delete(id) {
         const sql = `DELETE FROM pizzas WHERE id = ?`;
-
         return new Promise((resolve, reject) => {
             db.run(sql, [id], function (err) {
                 if (err) return reject(err);
+                resolve(this.changes);
+            });
+        });
+    }
 
+    static addComposition(pizzaId, ingredientId) {
+        const sql = `INSERT INTO product_compositions (pizza_id, ingredient_id) VALUES (?, ?)`;
+        return new Promise((resolve, reject) => {
+            db.run(sql, [pizzaId, ingredientId], function (err) {
+                if (err) return reject(err);
+                resolve(this.changes);
+            });
+        });
+    }
+
+    static findCompositions(pizzaId) {
+        const sql = `SELECT ingredient_id FROM product_compositions WHERE pizza_id = ? ORDER BY ingredient_id`;
+        return new Promise((resolve, reject) => {
+            db.all(sql, [pizzaId], (err, rows) => {
+                if (err) return reject(err);
+                resolve(rows);
+            });
+        });
+    }
+
+    static deleteCompositions(pizzaId) {
+        const sql = `DELETE FROM product_compositions WHERE pizza_id = ?`;
+        return new Promise((resolve, reject) => {
+            db.run(sql, [pizzaId], function (err) {
+                if (err) return reject(err);
                 resolve(this.changes);
             });
         });

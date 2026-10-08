@@ -1,21 +1,41 @@
-# I321-Martini_Dylan
+# I321 - Foodtruck microservices
 
-## Routes de l'API
+Le projet est séparé en deux nœuds indépendants :
 
-| Fonctionnalité | Méthode | Route | Code succès |
-|---|---|---|---|
-| Lister les pizzas | GET | `/api/products` | 200 |
-| Afficher une pizza | GET | `/api/products/:id` | 200 |
-| Ajouter une pizza | POST | `/api/products` | 201 |
-| Modifier une pizza | PUT | `/api/products/:id` | 200 |
-| Supprimer une pizza | DELETE | `/api/products/:id` | 204 |
+- `ms-pizzas` : API pizzas, port 3000, base `pizzas.sqlite`.
+- `ms-ingredients` : API ingrédients, port 3001, base `ingredients.sqlite`.
 
-Exemple du body :
+La table `product_compositions` appartient au microservice pizzas et conserve les associations `pizza_id` / `ingredient_id`. L'existence d'un ingrédient est contrôlée via HTTP auprès du microservice ingrédients.
 
+## Lancer le projet
+
+Terminal 1 :
+```bash
+cd ms-ingredients
+npm install
+npm run dev
+```
+
+Terminal 2 :
+```bash
+cd ms-pizzas
+npm install
+npm run dev
+```
+
+## Test rapide
+
+- `GET http://localhost:3001/api/v1/ingredients`
+- `GET http://localhost:3000/api/v1/pizzas`
+- `GET http://localhost:3000/api/v1/pizzas/4` retourne la pizza et récupère ses ingrédients via le microservice ingrédients.
+
+Exemple de création :
 ```json
 {
-  "title": "Diavola",
-  "image": null,
-  "ingredients": ["Tomato", "Mozzarella", "Salami"],
-  "price": 12.5
+  "name": "Pizza microservice test",
+  "description": "Test",
+  "imageUrl": "test.jpg",
+  "price": 12.5,
+  "ingredients": [1, 2]
 }
+```
